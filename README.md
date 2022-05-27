@@ -1,4 +1,9 @@
+# ℹ️ Hacked for SecondBase
+
+## https://github.com/customink/secondbase
+
 # Active Record Replica
+
 [![Gem Version](https://img.shields.io/gem/v/active_record_replica.svg)](https://rubygems.org/gems/active_record_replica)
 [![Build Status](https://travis-ci.org/teespring/active_record_replica.svg?branch=master)](https://travis-ci.org/teespring/active_record_replica)
 [![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](http://opensource.org/licenses/Apache-2.0)
@@ -7,6 +12,7 @@
 Redirect ActiveRecord (Rails) reads to replica databases while ensuring all writes go to the primary database.
 
 ## Status
+
 This is a slight modification of Rocket Job's original library, simply renaming it from `active_record_slave` to `active_record_replica`.
 
 In order to more clearly distinguish the library from `active_record_slave`, we also incremented the major version – it is, however, functionally equivalent.
@@ -24,21 +30,21 @@ Production Ready. Actively used in large production environments.
 
 ## Features
 
-* Redirecting reads to a single replica database.
-* Works with any database driver that works with ActiveRecord.
-* Supports all Rails 3, 4, or 5 read apis.
-    * Including dynamic finders, AREL, and ActiveRecord::Base.select.
-    * **NOTE**: In Rails 3 and 4, QueryCache is only enabled for BaseConnection by default. In Rails 5, it's enabled for all connections. [(PR)](https://github.com/rails/rails/pull/28869)
-* Transaction aware
-    * Detects when a query is inside of a transaction and sends those reads to the primary by default.
-    * Can be configured to send reads in a transaction to replica databases.
-* Lightweight footprint.
-* No overhead whatsoever when a replica is _not_ configured.
-* Negligible overhead when redirecting reads to the replica.
-* Connection Pools to both databases are retained and maintained independently by ActiveRecord.
-* The primary and replica databases do not have to be of the same type.
-    * For example Oracle could be the primary with MySQL as the replica database.
-* Debug logs include a prefix of `Replica: ` to indicate which SQL statements are going
+- Redirecting reads to a single replica database.
+- Works with any database driver that works with ActiveRecord.
+- Supports all Rails 3, 4, or 5 read apis.
+  - Including dynamic finders, AREL, and ActiveRecord::Base.select.
+  - **NOTE**: In Rails 3 and 4, QueryCache is only enabled for BaseConnection by default. In Rails 5, it's enabled for all connections. [(PR)](https://github.com/rails/rails/pull/28869)
+- Transaction aware
+  - Detects when a query is inside of a transaction and sends those reads to the primary by default.
+  - Can be configured to send reads in a transaction to replica databases.
+- Lightweight footprint.
+- No overhead whatsoever when a replica is _not_ configured.
+- Negligible overhead when redirecting reads to the replica.
+- Connection Pools to both databases are retained and maintained independently by ActiveRecord.
+- The primary and replica databases do not have to be of the same type.
+  - For example Oracle could be the primary with MySQL as the replica database.
+- Debug logs include a prefix of `Replica: ` to indicate which SQL statements are going
   to the replica database.
 
 ### Example showing Replica redirected read
@@ -144,23 +150,24 @@ By observation we noticed that all reads are made to a select set of methods and
 all writes are made directly to one method: `execute`.
 
 Using this observation `active_record_replica` only needs to intercept calls to the known select apis:
-* select_all
-* select_one
-* select_rows
-* select_value
-* select_values
+
+- select_all
+- select_one
+- select_rows
+- select_value
+- select_values
 
 Calls to the above methods are redirected to the replica active record model `ActiveRecordReplica::Replica`.
 This model is 100% managed by the regular Active Record mechanisms such as connection pools etc.
 
 This lightweight approach ensures that all calls to the above API's are redirected to the replica without impacting:
-* Transactions
-* Writes
-* Any SQL calls directly to `execute`
+
+- Transactions
+- Writes
+- Any SQL calls directly to `execute`
 
 One of the limitations with this approach is that any code that performs a query by calling `execute` direct will not
 be redirected to the replica instance. In this case replace the use of `execute` with one of the the above select methods.
-
 
 ## Note when using `dependent: destroy`
 
@@ -180,14 +187,15 @@ For Example:
 
 ~~ruby
 class Parent < ActiveRecord::Base
-  has_one :child, dependent: :destroy
+has_one :child, dependent: :destroy
 end
 
 class Child < ActiveRecord::Base
-  belongs_to :parent
+belongs_to :parent
 end
 
 # The following code will create an unused transaction against the primary, even when reads are going to replicas:
+
 parent = Parent.new
 parent.child = Child.new
 ~~
@@ -200,8 +208,8 @@ ignore any attempt Active Record makes at creating the transaction:
 
 ~~ruby
 ActiveRecordReplica.skip_transactions do
-  parent = Parent.new
-  parent.child = Child.new
+parent = Parent.new
+parent.child = Child.new
 end
 ~~
 
@@ -210,8 +218,8 @@ To help identify any code within a block that is creating transactions, wrap the
 
 ~~ruby
 ActiveRecordReplica.block_transactions do
-  parent = Parent.new
-  parent.child = Child.new
+parent = Parent.new
+parent.child = Child.new
 end
 ~~
 
@@ -248,17 +256,17 @@ production:
   username: username
   password: password
   encoding: utf8
-  adapter:  mysql
-  host:     primary1
-  pool:     50
+  adapter: mysql
+  host: primary1
+  pool: 50
   replica:
     database: production
     username: username
     password: password
     encoding: utf8
-    adapter:  mysql
-    host:     replica1
-    pool:     50
+    adapter: mysql
+    host: replica1
+    pool: 50
 ```
 
 Sometimes it is useful to turn on replica reads per host, for example to activate
@@ -294,17 +302,17 @@ production:
   username: username
   password: password
   encoding: utf8
-  adapter:  mysql
-  host:     primary1
-  pool:     50
+  adapter: mysql
+  host: primary1
+  pool: 50
   replica:
     database: production
     username: username
     password: password
     encoding: utf8
-    adapter:  mysql
-    host:     <%= %w(replica1 replica2 replica3).sample %>
-    pool:     50
+    adapter: mysql
+    host: <%= %w(replica1 replica2 replica3).sample %>
+    pool: 50
 ```
 
 Replicas can also be assigned to specific hosts by using the hostname:
@@ -335,14 +343,14 @@ The default behavior can also set to read/write operations against primary datab
 Create an initializer file config/initializer/active_record_replica.rb to force read from primary:
 
 ```yaml
-    ActiveRecordReplica.read_from_primary!
+ActiveRecordReplica.read_from_primary!
 ```
 
 Then use this method and supply block to read from the replica database:
 
 ```yaml
 ActiveRecordReplica.read_from_replica do
-   User.count
+User.count
 end
 ```
 
@@ -360,16 +368,16 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 2. Checkout your forked repository:
 
-    ```bash
-    git clone https://github.com/your_github_username/active_record_replica.git
-    cd active_record_replica
-    ```
+   ```bash
+   git clone https://github.com/your_github_username/active_record_replica.git
+   cd active_record_replica
+   ```
 
 3. Create branch for your contribution:
 
-    ```bash
-    git co -b your_new_branch_name
-    ```
+   ```bash
+   git co -b your_new_branch_name
+   ```
 
 4. Make code changes.
 
@@ -377,9 +385,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 6. Push to your fork origin.
 
-    ```bash
-    git push origin
-    ```
+   ```bash
+   git push origin
+   ```
 
 7. Submit PR from the branch on your fork in Github.
 

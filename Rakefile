@@ -1,6 +1,7 @@
 # Setup bundler to avoid having to run bundle exec all the time.
 require 'rubygems'
 require 'bundler/setup'
+Bundler.require :default, :development, :test
 
 require 'rake/testtask'
 require_relative 'lib/active_record_replica/version'

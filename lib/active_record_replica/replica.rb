@@ -1,6 +1,6 @@
 module ActiveRecordReplica
   # Class to hold replica connection pool
-  class Replica < ActiveRecord::Base
+  class Replica < SecondBase::Base
     # Prevent Rails from trying to create an instance of this model
     self.abstract_class = true
 

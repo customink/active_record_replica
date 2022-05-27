@@ -17,4 +17,5 @@ Gem::Specification.new do |spec|
   spec.license               = 'Apache-2.0'
   spec.required_ruby_version = '>= 2.0'
   spec.add_dependency 'activerecord', '>= 3.0', '< 6.0.0'
+  spec.add_dependency 'secondbase', '>= 2.0'
 end

@@ -12,7 +12,7 @@ module ActiveRecordReplica
   #     In a non-Rails environment, supply the environment such as
   #     'development', 'production'
   def self.install!(adapter_class = nil, environment = nil)
-    replica_config = ActiveRecord::Base.configurations[environment || Rails.env]["replica"]
+    replica_config = SecondBase.config["replica"]
     unless replica_config
       ActiveRecord::Base.logger.info("ActiveRecordReplica not installed since no replica database defined")
       return
@@ -30,7 +30,7 @@ module ActiveRecordReplica
     Replica.establish_connection(replica_config)
 
     # Inject a new #select method into the ActiveRecord Database adapter
-    base = adapter_class || ActiveRecord::Base.connection.class
+    base = adapter_class || SecondBase::Base.connection.class
     base.include(Extensions)
   end
 
